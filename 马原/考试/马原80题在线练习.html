@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>马原题库 · 80 题在线练习</title>
+<style>
+:root{
+  --bg:#f4f0e6; --card:#fffdf8; --ink:#22303c; --muted:#6b7a86;
+  --line:#e6ddcb; --accent:#235843; --accent-2:#1b4636;
+  --blue:#2f6db0; --blue-bg:#e9f1fb;
+  --purple:#7d4b9e; --purple-bg:#f2eafa;
+  --amber:#9a6b00; --amber-bg:#fdf3dc;
+  --ok:#1e7b45; --ok-bg:#e7f5ec; --bad:#b3261e; --bad-bg:#fdecea;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(1100px 480px at 50% -12%, #fffaf0 0%, rgba(255,250,240,0) 62%),
+    var(--bg);
+  color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",system-ui,-apple-system,"Segoe UI",sans-serif;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  
+}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+.hidden{display:none !important}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+h1{font-size:clamp(26px,5.4vw,36px);line-height:1.3;margin:10px 0 14px;font-weight:800;letter-spacing:.01em}
+.lede{color:var(--muted);font-size:15px;margin:0 0 20px;max-width:640px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.chip{font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px}
+.c-single{background:var(--blue-bg);color:var(--blue)}
+.c-multiple{background:var(--purple-bg);color:var(--purple)}
+.c-judge{background:var(--amber-bg);color:var(--amber)}
+.start-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  appearance:none;-webkit-appearance:none;border:0;border-radius:12px;
+  padding:12px 20px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s,transform .06s;
+  user-select:none;
+}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(35,88,67,.18)}
+.btn.primary:hover{background:var(--accent-2)}
+.btn.primary:disabled{background:#c3ccc6;box-shadow:none;cursor:not-allowed}
+.btn.ghost{background:var(--card);border:1.5px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:#cbbfa6}
+.btn.tiny{padding:5px 10px;font-size:13px;border-radius:9px}
+.btn:disabled{opacity:1}
+.resume-note{margin:14px 0 0;font-size:13.5px;color:var(--muted)}
+.tips{margin-top:26px;padding-top:18px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--muted)}
+.tips p{margin:0}
+.quiz-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.top-l{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.progress-text{font-size:13.5px;color:var(--muted);font-weight:700}
+.score-chip{font-size:13px;font-weight:700;color:var(--accent);background:#e9f2ec;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.pbar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin:2px 0 18px}
+.pbar-fill{height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .25s ease}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(34,48,60,.06)}
+.question-card{padding:22px 22px 18px}
+.q-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.q-index{color:var(--muted);font-weight:800;font-size:15px}
+.badge{font-size:12px;padding:3px 10px;border-radius:999px;font-weight:700;letter-spacing:.02em}
+.t-single{background:var(--blue-bg);color:var(--blue)}
+.t-multiple{background:var(--purple-bg);color:var(--purple)}
+.t-judge{background:var(--amber-bg);color:var(--amber)}
+.stem{font-size:18px;line-height:1.7;margin:2px 0 14px;font-weight:600}
+.options{display:flex;flex-direction:column;gap:9px;margin:0 0 6px}
+.option{
+  display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;
+  background:#fff;border:1.5px solid var(--line);border-radius:12px;
+  padding:12px 14px;font:inherit;color:inherit;cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.option:hover:not(:disabled){border-color:#cbbfa6}
+.option:disabled{cursor:default}
+.option .letter{
+  width:26px;height:26px;flex:0 0 26px;border-radius:50%;
+  background:#f0e9da;color:#6b5a3e;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13.5px;margin-top:1px;
+}
+.option .text{flex:1;min-width:0;font-size:15.5px;line-height:1.6}
+.option.selected{border-color:var(--accent);background:#eef5f1}
+.option.selected .letter{background:var(--accent);color:#fff}
+.option.correct{border-color:var(--ok);background:var(--ok-bg)}
+.option.correct .letter{background:var(--ok);color:#fff}
+.option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.option.wrong .letter{background:var(--bad);color:#fff}
+.feedback{margin-top:14px;border-radius:12px;padding:11px 14px;font-size:14.5px;font-weight:700}
+.feedback.ok{background:var(--ok-bg);color:var(--ok)}
+.feedback.bad{background:var(--bad-bg);color:var(--bad)}
+.qnav{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.qnav .btn{flex:1;min-width:108px}
+.sheet{position:fixed;inset:0;background:rgba(24,34,30,.4);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+.sheet-card{background:var(--card);width:100%;max-width:760px;border-radius:18px 18px 0 0;padding:16px 18px 26px;max-height:72vh;overflow:auto;box-shadow:0 -12px 40px rgba(0,0,0,.18)}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:15px}
+.sheet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px}
+.num-btn{
+  appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:#fff;
+  border-radius:10px;height:40px;font:inherit;font-size:13.5px;font-weight:700;
+  color:var(--ink);cursor:pointer;transition:border-color .15s;
+}
+.num-btn:hover{border-color:#cbbfa6}
+.num-btn.ok{background:var(--ok-bg);border-color:#bfe3cb;color:var(--ok)}
+.num-btn.bad{background:var(--bad-bg);border-color:#f2c9c4;color:var(--bad)}
+.num-btn.cur{outline:2px solid var(--accent);outline-offset:1px}
+.legend{display:flex;gap:16px;align-items:center;margin-top:14px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;background:#fff;border:1.5px solid var(--line);vertical-align:-1px}
+.dot.ok{background:var(--ok-bg);border-color:#bfe3cb}
+.dot.bad{background:var(--bad-bg);border-color:#f2c9c4}
+.result-card{padding:28px 22px;text-align:center}
+.score-ring{
+  --p:0;width:152px;height:152px;border-radius:50%;margin:8px auto 16px;position:relative;
+  background:conic-gradient(var(--accent) calc(var(--p)*1%), #ece4d3 0);
+  display:flex;align-items:center;justify-content:center;
+}
+.score-ring::after{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--card)}
+.score-inner{position:relative;z-index:1;display:flex;align-items:baseline;justify-content:center}
+.score-inner span{font-size:46px;font-weight:800;color:var(--accent);line-height:1}
+.score-inner small{font-size:14px;color:var(--muted);margin-left:2px}
+.result-line{color:var(--muted);font-size:14.5px;margin:0 0 18px}
+.breakdown{display:flex;flex-direction:column;gap:8px;text-align:left;background:#fbf7ee;border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:0 0 20px}
+.bd-row{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+.bd-row strong{color:var(--ink);font-weight:800}
+.wrong-box{text-align:left;margin-top:6px}
+.wrong-box h3{font-size:15px;margin:6px 0 10px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.wrong-item{display:flex;gap:10px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;font:inherit;color:var(--ink);cursor:pointer;transition:border-color .15s}
+.wrong-item:hover{border-color:#cbbfa6}
+.w-num{font-weight:800;color:var(--accent);flex:0 0 auto}
+.w-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.w-stem{font-size:14px;line-height:1.55}
+.w-meta{font-size:12.5px;color:var(--muted)}
+.all-good{color:var(--ok);font-weight:800;text-align:center;margin:10px 0}
+.result-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.result-actions .btn{flex:1;min-width:132px;max-width:220px}
+.toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);
+  background:#22303c;color:#fff;font-size:14px;padding:10px 18px;border-radius:999px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:99;max-width:80vw;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.foot{margin-top:26px;text-align:center;font-size:12.5px;color:#9aa6ae}
+@media (max-width:520px){
+  .wrap{padding:18px 14px 48px}
+  .question-card{padding:18px 14px 16px}
+  .stem{font-size:16.5px}
+  .option .text{font-size:15px}
+  .result-card{padding:24px 14px}
+}
+</style>
+</head>
+<body>
+
+<section class="screen" id="screen-start">
+  <div class="wrap">
+    <div class="eyebrow">马克思主义基本原理</div>
+    <h1>马原题库 · 80 题在线练习</h1>
+    <p class="lede">从去重后的 1,023 道题库中精选 80 道：单选 40 · 多选 20 · 判断 20。选完点「确认答案」立即判分，答完自动出成绩；进度保存在本机浏览器，随时可以接着做。</p>
+    <div class="chips">
+      <span class="chip c-single">单选题 40</span>
+      <span class="chip c-multiple">多选题 20</span>
+      <span class="chip c-judge">判断题 20</span>
+    </div>
+    <div class="start-actions">
+      <button class="btn primary" id="btnStart" type="button">开始练习</button>
+      <button class="btn ghost hidden" id="btnResume" type="button">继续上次</button>
+    </div>
+    <p class="resume-note hidden" id="resumeNote"></p>
+    <div class="tips">
+      <p>操作提示：单选题 / 判断题点击选项即可选中；多选题可勾选多个。键盘 A–E 选答案，Enter 确认或进入下一题，← / → 切换题目。答完后可查看成绩单、回看错题。</p>
+    </div>
+  </div>
+</section>
+
+<section class="screen hidden" id="screen-quiz">
+  <div class="wrap">
+    <div class="quiz-top">
+      <div class="top-l">
+        <span class="progress-text" id="progressText">第 1 / 80 题</span>
+        <button class="btn tiny ghost" id="btnSheet" type="button">题号</button>
+        <button class="btn tiny ghost" id="btnSubmit" type="button">交卷</button>
+      </div>
+      <span class="score-chip" id="scoreChip">已答 0 · 正确 0</span>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="progressBar"></div></div>
+    <section class="card question-card">
+      <div class="q-head">
+        <span class="badge" id="typeBadge">单选题</span>
+        <span class="q-index" id="qnum">1.</span>
+      </div>
+      <h2 class="stem" id="stem"></h2>
+      <div class="options" id="options"></div>
+      <div class="feedback hidden" id="feedback"></div>
+      <div class="qnav">
+        <button class="btn ghost" id="btnPrev" type="button">上一题</button>
+        <button class="btn primary" id="btnConfirm" type="button">确认答案</button>
+        <button class="btn primary" id="btnNext" type="button">下一题</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="sheet hidden" id="sheet">
+    <div class="sheet-card">
+      <div class="sheet-head">
+        <strong>题号面板</strong>
+        <button class="btn tiny ghost" id="btnSheetClose" type="button">收起</button>
+      </div>
+      <div class="sheet-grid" id="sheetGrid"></div>
+      <div class="legend">
+        <span><span class="dot ok"></span>答对</span>
+        <span><span class="dot bad"></span>答错</span>
+        <span><span class="dot"></span>未答</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen hidden" id="screen-result">
+  <div class="wrap">
+    <div class="card result-card">
+      <div class="eyebrow">练习结果</div>
+      <div class="score-ring" id="scoreRing">
+        <div class="score-inner"><span id="scoreNum">0</span><small>分</small></div>
+      </div>
+      <p class="result-line" id="resultLine"></p>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="wrong-box" id="wrongBox"></div>
+      <div class="result-actions">
+        <button class="btn primary" id="btnRestart" type="button">重新练习</button>
+        <button class="btn ghost" id="btnBackHome" type="button">返回首页</button>
+      </div>
+    </div>
+    <p class="foot">题目来自《马原题库_去重版_1023题》· 本页离线可用</p>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var QUESTIONS = [{"id":1,"type":"single","label":"单选","stem":"划分两种历史观的根本标准是","options":[["A","是否承认人类社会的内部矛盾"],["B","是否承认阶级斗争在社会发展中的决定作用"],["C","是否承认社会存在决定社会意识"],["D","是否承认国家是阶级矛盾不可调和的产物"]],"answers":["C"]},{"id":2,"type":"single","label":"单选","stem":"生产力范畴反映的是（ ）","options":[["A","人与人之间的经济关系"],["B","人与人之间的政治关系"],["C","人与自然之间的关系"],["D","人与人之间的思想关系"]],"answers":["C"]},{"id":3,"type":"single","label":"单选","stem":"社会主义由空想变为科学的标志性著作是（ ）","options":[["A","《资本论》"],["B","《德意志意识形态》"],["C","《共产党宣言》"],["D","《反杜林论》"]],"answers":["C"]},{"id":4,"type":"single","label":"单选","stem":"劳动过程是劳动的一般性质和劳动的社会形式的统一。劳动的一般性质是指它是","options":[["A","人与自然之间的物质变换过程"],["B","个人与社会之间的相互作用过程"],["C","劳动者之间的分工协作过程"],["D","自然与社会之间的相互影响过程"]],"answers":["A"]},{"id":5,"type":"single","label":"单选","stem":"理解全部人类历史的钥匙，应当从","options":[["A","阶级斗争发展史中去寻找"],["B","生产劳动发展史中去寻找"],["C","地理环境变迁史中去寻找"],["D","政治制度演变史中去寻找"]],"answers":["B"]},{"id":6,"type":"single","label":"单选","stem":"“人性自私”观点的错误在于","options":[["A","不符合“人之初，性本善”的观点"],["B","违背人有追求自由、平等、幸福的天性"],["C","把人的自然属性当作人的根本属性"],["D","违背“人的本质在其现实性上是一切社会关系的总和”的科学论断"]],"answers":["D"]},{"id":7,"type":"single","label":"单选","stem":"随着电脑的发明及其不断发展和完善，人类在解决没有感觉的物质同有感觉能力的物质发生联系的问题上向前迈进了一大步，这根源于。","options":[["A","意识第一性，物质第二性的唯心主义"],["B","物质与意识是世界共同本原的二元论"],["C","世界是可以被人类认识的可知论"],["D","物质是意识基础的唯物主义"]],"answers":["D"]},{"id":8,"type":"single","label":"单选","stem":"马克思主义认识论首要的和基本的观点是：","options":[["A","唯物论的观点"],["B","实践的观点"],["C","辩证法的观点"],["D","认识是一个过程的观点"]],"answers":["B"]},{"id":9,"type":"single","label":"单选","stem":"哲学的基本问题是（ ）","options":[["A","物质和意识的关系问题"],["B","物质和运动的关系问题"],["C","物质和时空的关系问题"],["D","理论和实践的关系问题"]],"answers":["A"]},{"id":10,"type":"single","label":"单选","stem":"地理环境对社会发展的作用主要通过","options":[["A","对人的心理素质的影响才能实现"],["B","对人的生理结构的影响才能实现"],["C","对民族气质的影响才能实现"],["D","对生产过程的影响才能实现"]],"answers":["D"]},{"id":11,"type":"single","label":"单选","stem":"古代朴素唯物主义把世界的本原归结为","options":[["A","客观存在的各种物体"],["B","宇宙中存在的一切现象"],["C","物质的具体形态和结构"],["D","某种具体的“原初物质”"]],"answers":["D"]},{"id":12,"type":"single","label":"单选","stem":"系统论的最基本原则是","options":[["A","整体性"],["B","区别性"],["C","最优化"],["D","合理化"]],"answers":["A"]},{"id":13,"type":"single","label":"单选","stem":"“社会一旦有技术上的需要，则这种需要就会比十所大学更能把科学推向前进”。这段话表明","options":[["A","认识产生和发展根源于社会实践的需要"],["B","实践创造了认识的必要条件"],["C","实践沟通了主客体之间的联系"],["D","实践提供了认识的物质手段"]],"answers":["A"]},{"id":14,"type":"single","label":"单选","stem":"人的任何意识，都是对客观世界的","options":[["A","正确反映"],["B","歪曲反映"],["C","虚幻反映"],["D","反映"]],"answers":["D"]},{"id":15,"type":"single","label":"单选","stem":"事物在某一或某些局部上发生性质的变化，这是","options":[["A","根本质变 B、阶段性的部分质变"],["B","局部性的部分质变"],["C","单纯的量变"]],"answers":["B"]},{"id":16,"type":"single","label":"单选","stem":"直接经验和间接经验的关系是（ ）","options":[["A","认识中内容和形式的关系"],["B","认识中“源”和“流”的关系"],["C","感性认识和理性认识的关系"],["D","实践和理论的关系"]],"answers":["B"]},{"id":17,"type":"single","label":"单选","stem":"质量互变规律的基本内容是","options":[["A","由量变到质变"],["B","由质变到量变"],["C","由量变到质变，由质变到量变，如此循环往复，以至无穷，不断推动事物向前发展"],["D","量变之中有质变，质变之中有量变"]],"answers":["C"]},{"id":18,"type":"single","label":"单选","stem":"正确发挥意识能动作用的最基本的前提是","options":[["A","个人积极性的充分调动"],["B","集体智慧的充分发挥"],["C","对客观规律的正确反映"],["D","对保守思想的彻底克服"]],"answers":["C"]},{"id":19,"type":"single","label":"单选","stem":"唯物辩证法认为运动是指","options":[["A","物体是空间的位置移动和数量的增减"],["B","宇宙间发生的一切变化和过程"],["C","从物理运动到生物运动的转化"],["D","客观事物的前进上升的过程"]],"answers":["B"]},{"id":20,"type":"single","label":"单选","stem":"“社会形态发展是自然历史过程”，指的是","options":[["A","社会形态的发展与自然界的发展完全一样"],["B","社会形态的发展是纯粹自发的过程"],["C","社会形态的发展是一种客观的有规律的运动过程"],["D","社会形态的发展与主体的选择无关"]],"answers":["C"]},{"id":21,"type":"single","label":"单选","stem":"人们常说：“前途是光明的，道路是曲折的”。这句话体现的最主要的辩证法原理是","options":[["A","世界永恒发展的原理"],["B","事物普遍联系的原理"],["C","否定之否定规律"],["D","质量互变规律"]],"answers":["C"]},{"id":22,"type":"single","label":"单选","stem":"科学证明，人脑是","options":[["A","思维的源泉"],["B","思维的产物"],["C","思维的器官"],["D","思维的对象"]],"answers":["C"]},{"id":23,"type":"single","label":"单选","stem":"一切唯物主义的认识论都是","options":[["A","反映论"],["B","能动的反映论"],["C","科学的反映论"],["D","机械的反映论"]],"answers":["A"]},{"id":24,"type":"single","label":"单选","stem":"严格意义上的社会革命是指","options":[["A","科学革命和技术革命"],["B","文化革命和思想革命"],["C","革命阶级向反动统治阶级夺取国家政权的斗争"],["D","统治阶级内部进步势力反对保守势力的斗争"]],"answers":["C"]},{"id":25,"type":"single","label":"单选","stem":"人类所特有的区别于动物的特点是","options":[["A","客观实在性"],["B","主观能动性"],["C","规律客观性"],["D","运动绝对性"]],"answers":["B"]},{"id":26,"type":"single","label":"单选","stem":"《共产党宣言》是在哪年发表的","options":[["A","1748 年"],["B","1848 年"],["C","1948 年"],["D","1648 年"]],"answers":["A"]},{"id":27,"type":"single","label":"单选","stem":"正确的意识来源于客观世界，错误的思维归根结底来源于","options":[["A","人脑的错误判断"],["B","人的主观想象"],["C","客观世界"],["D","落后的思想意识"]],"answers":["C"]},{"id":28,"type":"single","label":"单选","stem":"意识就其本质来说，它是","options":[["A","人脑的机能和对客观存在的反映"],["B","人脑分泌出来的一种物质"],["C","一种神秘的主观现象"],["D","人的一种与生俱来的本能"]],"answers":["A"]},{"id":29,"type":"single","label":"单选","stem":"形而上学唯物主义物质观的错误是","options":[["A","否认物质的客观性"],["B","不懂得个性和共性的辩证关系"],["C","否认物质的可知性"],["D","把可直接感知的实物当作世界的本原"]],"answers":["B"]},{"id":30,"type":"single","label":"单选","stem":"时间和空间是人类感性直观中的先天形式这是一种","options":[["A","主观唯心主义的观点"],["B","二元论的观点"],["C","客观唯心主义的观点"],["D","机械唯物论的观点"]],"answers":["A"]},{"id":31,"type":"single","label":"单选","stem":"实践之所以是检验真理的唯一标准是由：","options":[["A","真理的相对性和绝对性决定的"],["B","真理的本性和实践的特点决定的"],["C","实践的具体性和历史性决定的"],["D","实践的有条件性和相对性决定的"]],"answers":["B"]},{"id":32,"type":"single","label":"单选","stem":"唯物辩证法所理解的发展是","options":[["A","事物的永恒运动"],["B","新事物的产生和旧事物的灭亡"],["C","仅仅是数量的增减"],["D","循环往复，周而复始"]],"answers":["B"]},{"id":33,"type":"single","label":"单选","stem":"质量互变规律揭示了","options":[["A","事物发展的动力和源泉"],["B","事物的质和量的关系"],["C","事物发展的方向和道路"],["D","事物变化发展的基本形式和状态"]],"answers":["D"]},{"id":34,"type":"single","label":"单选","stem":"马克思主义哲学按其本性来说是","options":[["A","运动的、发展的"],["B","批判的、革命的"],["C","科学的、真理的"],["D","实践的、客观的"]],"answers":["B"]},{"id":35,"type":"single","label":"单选","stem":"形而上学所理解的同一是","options":[["A","对立同一"],["B","包含差别的同一"],["C","抽象的同一"],["D","具体的同一"]],"answers":["C"]},{"id":36,"type":"single","label":"单选","stem":"中国古代哲学家荀子说：“天行有常，不为尧存，不为桀亡。”这句话体现的哲学道理是","options":[["A","物质运动规律具有普遍性"],["B","物质运动规律具有重复性"],["C","物质运动规律具有稳定性"],["D","物质运动规律具有客观性"]],"answers":["D"]},{"id":37,"type":"single","label":"单选","stem":"辩证唯物主义一元论的根本要求是","options":[["A","从原则出发"],["B","从正确的理论出发"],["C","一切从实际出发，实事求是"],["D","从多数人的愿望出发"]],"answers":["C"]},{"id":38,"type":"single","label":"单选","stem":"马克思主义哲学产生之前，不存在","options":[["A","唯物史观和唯心史观的斗争"],["B","辩证法和形而上学的斗争"],["C","唯物主义和唯心主义的斗争"],["D","可知论和不可知论的斗争"]],"answers":["A"]},{"id":39,"type":"single","label":"单选","stem":"辩证法和形而上学在真理观上的对立表现在","options":[["A","前者认为真理是发展的，后者认为真理是不发展的"],["B","前者认为真理中包含着错误，后者认为真理是绝对正确的"],["C","前者认为真理具有客观性，后者认为真理是纯粹主观的"],["D","前者认为真理来源于客观世界，后者认为真理来源于先验原则"]],"answers":["A"]},{"id":40,"type":"single","label":"单选","stem":"对于同一事物，不同的人有不同的反映，这说明：","options":[["A","意识是主体的自由创造"],["B","意识不受客体影响"],["C","意识受主体状况的影响"],["D","意识的内容是主观的"]],"answers":["C"]},{"id":41,"type":"multiple","label":"多选","stem":"下列各项属于意识能动性具体表现的有","options":[["A","意识活动具有目的性和计划性"],["B","意识活动能反映事物的本质和规律"],["C","意识活动对人体生理活动有调节和影响作用"],["D","意识活动具有通过实践改变世界的作用"],["E","意识活动能够改变社会运动的规律"]],"answers":["A","B","C","D"]},{"id":42,"type":"multiple","label":"多选","stem":"在实践和认识的关系中","options":[["A","实践是认识的来源"],["B","实践是认识发展的动力"],["C","实践是检验认识正确与否的标准"],["D","实践是认识的目的"],["E","认识对实践有指导作用"]],"answers":["A","B","C","D","E"]},{"id":43,"type":"multiple","label":"多选","stem":"运动和物质不可分，运动是物质的","options":[["A","根本属性"],["B","主观形式"],["C","内部结构"],["D","存在方式"],["E","唯一特性"]],"answers":["A","D"]},{"id":44,"type":"multiple","label":"多选","stem":"意识能动性的具体表现是","options":[["A","意识活动具有能动的目的性和计划性"],["B","意识活动是个人由感性认识不断上升到理性认识的能动过程"],["C","意识活动能反映事物的本质和规律"],["D","意识对人体的生理活动有能动的调节和控制作用"],["E","意识活动具有通过实践改造世界的作用"]],"answers":["A","B","C","D","E"]},{"id":45,"type":"multiple","label":"多选","stem":"下列各项属于马克思主义哲学对待唯心主义的正确态度的有","options":[["A","全盘否定，划清界限"],["B","基本肯定，积极继承"],["C","认清其本质，揭露其错误"],["D","剖析其根源，指出其危害"],["E","具体分析，批判继承"]],"answers":["C","D","E"]},{"id":46,"type":"multiple","label":"多选","stem":"感觉和概念的区别在于","options":[["A","感觉是感性认识的形式，概念是理性认识的形式"],["B","感觉是对事物现象的反映，概念是对事物本质的反映"],["C","感觉具有直接性，概念具有间接性"],["D","感觉不可靠，概念真实可靠"],["E","感觉具有形象性，概念具有抽象性"]],"answers":["A","B","C","E"]},{"id":47,"type":"multiple","label":"多选","stem":"下列哪些说法表示了时间的一维性","options":[["A","盛年不重来，一日难再晨。（陶渊明诗句）"],["B","失落黄金有份量，错过光阴无处寻（谚语）"],["C","光阴好比河中水，只能流去不复回（谚语）"],["D","莫说年纪小，人生容易老；莫说时候早，一去没处找。（打油诗）"],["E","百事宜早不宜迟。（谚语）"]],"answers":["A","B","C","D"]},{"id":48,"type":"multiple","label":"多选","stem":"下列选项中，属于唯物辩证法基本规律的有","options":[["A","质量互变规律"],["B","对立统一规律"],["C","联系发展规律"],["D","否定之否定规律"],["E","因果作用规律"]],"answers":["A","B","D"]},{"id":49,"type":"multiple","label":"多选","stem":"哲学的产生与发展取决于下列哪些因素","options":[["A","社会生产力发展水平"],["B","科学发展的状况"],["C","阶级斗争情况"],["D","哲学自身的发展情况"],["E","宗教信仰的变化"]],"answers":["A","B","C","D"]},{"id":50,"type":"multiple","label":"多选","stem":"按照辩证唯物主义的物质定义，下列哪些现象属于物质现象","options":[["A","镜中花，水中月"],["B","阶级斗争"],["C","上层建筑中的意识形态"],["D","未实施的城市建设计划"],["E","日月星辰和山川河流"]],"answers":["A","B","E"]},{"id":51,"type":"multiple","label":"多选","stem":"违背感性认识和理性认识的辩证统一原理，会使我们犯","options":[["A","经验论的错误"],["B","唯理论的错误"],["C","经验主义的错误"],["D","教条主义的错误"],["E","绝对主义的错误"]],"answers":["A","B","C","D"]},{"id":52,"type":"multiple","label":"多选","stem":"人坐在火车上与火车一起向目的地前进时，表明了","options":[["A","这个人一直在运动，不存在静止"],["B","这个人是运动和静止的统一"],["C","就局部来说，这个人是静止的"],["D","这个人的静止是运动的特殊表现"],["E","这个人的运动和静止都是绝对的"]],"answers":["B","C","D"]},{"id":53,"type":"multiple","label":"多选","stem":"世界观和人生观的关系是","options":[["A","世界观决定人生观"],["B","人生观是世界观的基础"],["C","人生观和世界观没有必然联系"],["D","人生观对世界观有重大影响"],["E","人生观是世界观的重要组成部分"]],"answers":["A","D","E"]},{"id":54,"type":"multiple","label":"多选","stem":"实践在认识中的决定作用表现在","options":[["A","实践是认识的基本来源"],["B","实践是认识发展的动力"],["C","实践是认识的真理性的标准"],["D","实践是认识的最终目的"],["E","实践是人类生存和发展的基本活动"]],"answers":["A","B","C","D"]},{"id":55,"type":"multiple","label":"多选","stem":"世界上除了运动着的物质，什么也不存在，这种观点是","options":[["A","彻底的唯物主义观点"],["B","彻底的无神论观点"],["C","形而上学观点"],["D","辩证唯物主义观点"],["E","朴素唯物主义观点"]],"answers":["A","D"]},{"id":56,"type":"multiple","label":"多选","stem":"邓小平理论是当代中国的马克思主义，是马克思主义在中国发展的新阶段，它哲学的发展主要表现","options":[["A","坚持马列主义、毛泽东思想的精髓实事求是"],["B","强调实践观点和实践是检验真理的唯一标准"],["C","强调“发展是硬道理”"],["D","高度重视发展生产力"],["E","提出科会主义初级阶段理论"]],"answers":["A","B","C","D","E"]},{"id":57,"type":"multiple","label":"多选","stem":"下列说法中，正确体现意识能动性的有","options":[["A","胸有成竹，料事如神"],["B","纸上谈兵，画饼充饥"],["C","天下无难事，只怕有心人"],["D","不怕做不到，就怕想不到"],["E","运筹帷幄之中，决胜千里之外"]],"answers":["A","C","E"]},{"id":58,"type":"multiple","label":"多选","stem":"“先有计划，后有工作；先有图纸，后造房子”，这说明","options":[["A","意识决定物质"],["B","意识第一性，物质第二性"],["C","房子是主观意志的产物"],["D","意识对物质的能动作用"],["E","人类的实践活动是有意识，有目的的活动"]],"answers":["D","E"]},{"id":59,"type":"multiple","label":"多选","stem":"理论联系实际就要","options":[["A","认真读书、刻苦学习马列主义"],["B","分析解决面临的实际问题"],["C","联系当代世界的深刻变化"],["D","联系我国社会主义初级阶段的基本国情"],["E","用什么学什么，学什么就立即用什么"]],"answers":["A","B","C","D"]},{"id":60,"type":"multiple","label":"多选","stem":"矛盾的同一性和斗争性的关系包括下列哪些选项","options":[["A","斗争性是同一性的基础"],["B","斗争性寓于同一性之中"],["C","没有斗争性就没有同一性"],["D","没有同一性也没有斗争性"],["E","同一性是绝对的，斗争性是相对的"]],"answers":["A","B","C","D"]},{"id":61,"type":"judge","label":"判断","stem":"社会主义是实现共产主义的过渡阶段","options":[["A","正确"],["B","错误"]],"answers":["A"]},{"id":62,"type":"judge","label":"判断","stem":"客体只有客观性，没有主观性。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":63,"type":"judge","label":"判断","stem":"在检验认识的真理性问题中，一定的实践并不能证明一种认识就是真理或者就是谬误。因此实践不能成为检验认识真理性的标准。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":64,"type":"judge","label":"判断","stem":"历史人物对历史发展起决定作用。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":65,"type":"judge","label":"判断","stem":"最先进的人工智能会拥有人的意识","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":66,"type":"judge","label":"判断","stem":"人口对社会发展起决定作用。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":67,"type":"judge","label":"判断","stem":"马克思主义理论体系的核心和实质是剩余价值学说","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":68,"type":"judge","label":"判断","stem":"国家垄断资本主义的产生使得人民群众的生活水平有所改善和提高。","options":[["A","正确"],["B","错误"]],"answers":["A"]},{"id":69,"type":"judge","label":"判断","stem":"所有的真理都是客观真理，这是真理问题上的辩证法。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":70,"type":"judge","label":"判断","stem":"“我们今天只能按照能得到的真理去生活，并且准备明天把它叫做是假的”。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":71,"type":"judge","label":"判断","stem":"超额剩余价值是资本家追求相对剩余价值的结果。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":72,"type":"judge","label":"判断","stem":"生产力所解决的是人与自然的矛盾。","options":[["A","正确"],["B","错误"]],"answers":["A"]},{"id":73,"type":"judge","label":"判断","stem":"质变是事物根本性质的变化，都是通过爆发式飞跃的方式实现的。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":74,"type":"judge","label":"判断","stem":"垄断价格违背了价值规律。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":75,"type":"judge","label":"判断","stem":"在生产力与生产关系的矛盾运动中，起决定作用的是生产力。","options":[["A","正确"],["B","错误"]],"answers":["A"]},{"id":76,"type":"judge","label":"判断","stem":"割裂真理的绝对性与相对性，会犯教条主义与虚无主义的错误。","options":[["A","正确"],["B","错误"]],"answers":["A"]},{"id":77,"type":"judge","label":"判断","stem":"劳动力和劳动在一定条件下都可以成为商品。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":78,"type":"judge","label":"判断","stem":"共产主义是人类社会发展的终点","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":79,"type":"judge","label":"判断","stem":"价值是凝结在商品中的一般人类劳动，所以，劳动产品和商品一样也具有价值。","options":[["A","正确"],["B","错误"]],"answers":["B"]},{"id":80,"type":"judge","label":"判断","stem":"当代资本主义的新变化表明资本主义可以“和平长入”社会主义。","options":[["A","正确"],["B","错误"]],"answers":["B"]}];
+  var TOTAL = QUESTIONS.length;
+  var STORE_KEY = "mayuan-quiz80-v1";
+  var TYPE_META = {
+    single: { label: "单选题", cls: "t-single" },
+    multiple: { label: "多选题", cls: "t-multiple" },
+    judge: { label: "判断题", cls: "t-judge" }
+  };
+  var state = { cur: 0, answers: {}, confirmed: {} };
+  var toastTimer = null;
+
+  function $(id) { return document.getElementById(id); }
+  function show(node, visible) { node.classList.toggle("hidden", !visible); }
+  function showScreen(name) {
+    ["start", "quiz", "result"].forEach(function (n) {
+      show($("screen-" + n), n === name);
+    });
+    window.scrollTo(0, 0);
+  }
+  function flash(msg) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 1800);
+  }
+
+  function loadSaved() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      if (!data || data.v !== 1 || !data.answers) return null;
+      return data;
+    } catch (e) { return null; }
+  }
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        v: 1, answers: state.answers, confirmed: state.confirmed, cur: state.cur
+      }));
+    } catch (e) {}
+  }
+  function clearSaved() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+  }
+
+  function answeredCount() { return Object.keys(state.confirmed).length; }
+  function isCorrect(q, sel) {
+    if (!q || !sel || !sel.length) return false;
+    return sel.slice().sort().join(",") === q.answers.slice().sort().join(",");
+  }
+  function correctCount() {
+    var n = 0;
+    for (var i = 0; i < TOTAL; i++) {
+      if (state.confirmed[i] && isCorrect(QUESTIONS[i], state.answers[i])) n++;
+    }
+    return n;
+  }
+  function answerText(q) {
+    if (q.type === "judge") {
+      return q.answers.map(function (l) {
+        return l + "（" + (l === "A" ? "正确" : "错误") + "）";
+      }).join("、");
+    }
+    return q.answers.join("、");
+  }
+
+  function renderOptions(q, i) {
+    var box = $("options");
+    box.innerHTML = "";
+    var sel = state.answers[i] || [];
+    var conf = !!state.confirmed[i];
+    q.options.forEach(function (pair) {
+      var letter = pair[0];
+      var text = pair[1];
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "option";
+      var l = document.createElement("span");
+      l.className = "letter";
+      l.textContent = letter;
+      var t = document.createElement("span");
+      t.className = "text";
+      t.textContent = text;
+      btn.appendChild(l);
+      btn.appendChild(t);
+      if (sel.indexOf(letter) !== -1) btn.classList.add("selected");
+      if (conf) {
+        btn.disabled = true;
+        if (q.answers.indexOf(letter) !== -1) btn.classList.add("correct");
+        else if (sel.indexOf(letter) !== -1) btn.classList.add("wrong");
+      } else {
+        btn.addEventListener("click", function () { toggleOption(i, letter); });
+      }
+      box.appendChild(btn);
+    });
+  }
+
+  function renderFeedback(q, i) {
+    var fb = $("feedback");
+    if (!state.confirmed[i]) {
+      fb.textContent = "";
+      fb.className = "feedback hidden";
+      return;
+    }
+    var ok = isCorrect(q, state.answers[i]);
+    fb.textContent = (ok ? "✅ 回答正确" : "❌ 回答错误") + " · 正确答案：" + answerText(q);
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+  }
+
+  function renderSheet() {
+    if ($("sheet").classList.contains("hidden")) return;
+    var grid = $("sheetGrid");
+    grid.innerHTML = "";
+    for (var i = 0; i < TOTAL; i++) {
+      (function (idx) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "num-btn";
+        b.textContent = String(idx + 1);
+        if (state.confirmed[idx]) b.classList.add(isCorrect(QUESTIONS[idx], state.answers[idx]) ? "ok" : "bad");
+        if (idx === state.cur) b.classList.add("cur");
+        b.addEventListener("click", function () {
+          jumpTo(idx);
+          toggleSheet(false);
+        });
+        grid.appendChild(b);
+      })(i);
+    }
+  }
+
+  function render() {
+    var i = state.cur;
+    var q = QUESTIONS[i];
+    var meta = TYPE_META[q.type];
+    $("progressText").textContent = "第 " + (i + 1) + " / " + TOTAL + " 题";
+    $("progressBar").style.width = (answeredCount() / TOTAL * 100) + "%";
+    $("scoreChip").textContent = "已答 " + answeredCount() + " · 正确 " + correctCount();
+    var badge = $("typeBadge");
+    badge.textContent = meta.label;
+    badge.className = "badge " + meta.cls;
+    $("qnum").textContent = (i + 1) + ".";
+    $("stem").textContent = q.stem;
+    renderOptions(q, i);
+    renderFeedback(q, i);
+    var conf = !!state.confirmed[i];
+    $("btnPrev").disabled = (i === 0);
+    $("btnConfirm").disabled = conf || !(state.answers[i] || []).length;
+    $("btnConfirm").textContent = conf ? "已确认" : "确认答案";
+    $("btnNext").textContent = (i === TOTAL - 1) ? "查看成绩" : "下一题";
+    $("btnSubmit").textContent = (answeredCount() === TOTAL) ? "成绩单" : "交卷";
+    renderSheet();
+  }
+
+  function toggleOption(i, letter) {
+    if (state.confirmed[i]) return;
+    var q = QUESTIONS[i];
+    var sel = (state.answers[i] || []).slice();
+    if (q.type === "multiple") {
+      var p = sel.indexOf(letter);
+      if (p !== -1) sel.splice(p, 1);
+      else sel.push(letter);
+    } else {
+      sel = (sel.length === 1 && sel[0] === letter) ? [] : [letter];
+    }
+    state.answers[i] = sel;
+    save();
+    render();
+  }
+
+  function confirmAnswer() {
+    var i = state.cur;
+    if (state.confirmed[i]) return;
+    if (!(state.answers[i] || []).length) { flash("请先选择一个答案"); return; }
+    state.confirmed[i] = true;
+    save();
+    render();
+  }
+
+  function prevQ() {
+    if (state.cur > 0) { state.cur--; save(); render(); }
+  }
+  function nextQ() {
+    if (state.cur < TOTAL - 1) { state.cur++; save(); render(); }
+    else requestResult();
+  }
+  function requestResult() {
+    var rest = TOTAL - answeredCount();
+    if (rest > 0 && !window.confirm("还有 " + rest + " 题未确认答案，确定现在查看成绩吗？")) return;
+    showResult();
+  }
+
+  function jumpTo(i) {
+    state.cur = i;
+    save();
+    render();
+    showScreen("quiz");
+  }
+
+  function toggleSheet(open) {
+    show($("sheet"), open);
+    renderSheet();
+  }
+
+  function showResult() {
+    var correct = 0;
+    var unanswered = TOTAL - answeredCount();
+    var wrongItems = [];
+    var by = { single: { ok: 0, total: 0 }, multiple: { ok: 0, total: 0 }, judge: { ok: 0, total: 0 } };
+    for (var i = 0; i < TOTAL; i++) {
+      var q = QUESTIONS[i];
+      var sel = state.answers[i] || [];
+      by[q.type].total++;
+      if (state.confirmed[i]) {
+        if (isCorrect(q, sel)) { correct++; by[q.type].ok++; }
+        else wrongItems.push({ i: i, q: q, sel: sel });
+      } else {
+        wrongItems.push({ i: i, q: q, sel: sel });
+      }
+    }
+    var score = Math.round((correct / TOTAL) * 100);
+    $("scoreNum").textContent = String(score);
+    $("scoreRing").style.setProperty("--p", String(score));
+    $("resultLine").textContent = "答对 " + correct + " / " + TOTAL + " 题" +
+      (unanswered ? " · 未作答 " + unanswered + " 题" : "") + " · 正确率 " + score + "%";
+    var bd = $("breakdown");
+    bd.innerHTML = "";
+    [["single", "单选题"], ["multiple", "多选题"], ["judge", "判断题"]].forEach(function (pair) {
+      var row = document.createElement("div");
+      row.className = "bd-row";
+      var l = document.createElement("span");
+      l.textContent = pair[1];
+      var r = document.createElement("strong");
+      r.className = "bd-val";
+      r.textContent = by[pair[0]].ok + " / " + by[pair[0]].total;
+      row.appendChild(l);
+      row.appendChild(r);
+      bd.appendChild(row);
+    });
+    var box = $("wrongBox");
+    box.innerHTML = "";
+    if (!wrongItems.length) {
+      var p = document.createElement("p");
+      p.className = "all-good";
+      p.textContent = "全部答对，太强了！";
+      box.appendChild(p);
+    } else {
+      var h = document.createElement("h3");
+      h.textContent = "错题与未答题（点击回看原题）";
+      box.appendChild(h);
+      wrongItems.forEach(function (item) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "wrong-item";
+        btn.addEventListener("click", function () { jumpTo(item.i); });
+        var num = document.createElement("span");
+        num.className = "w-num";
+        num.textContent = String(item.i + 1) + ".";
+        var body = document.createElement("span");
+        body.className = "w-body";
+        var stem = document.createElement("span");
+        stem.className = "w-stem";
+        stem.textContent = item.q.stem.length > 46 ? item.q.stem.slice(0, 46) + "…" : item.q.stem;
+        var meta = document.createElement("span");
+        meta.className = "w-meta";
+        meta.textContent = "你的答案：" + (item.sel.length ? item.sel.join("、") : "未作答") +
+          "　正确答案：" + answerText(item.q);
+        body.appendChild(stem);
+        body.appendChild(meta);
+        btn.appendChild(num);
+        btn.appendChild(body);
+        box.appendChild(btn);
+      });
+    }
+    showScreen("result");
+    save();
+  }
+
+  function begin(saved) {
+    state.cur = saved ? Math.min(saved.cur || 0, TOTAL - 1) : 0;
+    state.answers = saved ? (saved.answers || {}) : {};
+    state.confirmed = saved ? (saved.confirmed || {}) : {};
+    render();
+    showScreen("quiz");
+    save();
+  }
+
+  function refreshStart() {
+    var s = loadSaved();
+    var n = s ? Object.keys(s.confirmed || {}).length : 0;
+    if (n > 0) {
+      $("resumeNote").textContent = "上次进度：已答 " + n + " 题，停在第 " +
+        (Math.min(s.cur || 0, TOTAL - 1) + 1) + " 题。";
+      show($("resumeNote"), true);
+      show($("btnResume"), true);
+      $("btnStart").textContent = "重新开始";
+    } else {
+      show($("resumeNote"), false);
+      show($("btnResume"), false);
+      $("btnStart").textContent = "开始练习";
+    }
+  }
+
+  function init() {
+    refreshStart();
+
+    $("btnStart").addEventListener("click", function () {
+      var s = loadSaved();
+      var n = s ? Object.keys(s.confirmed || {}).length : 0;
+      if (n > 0 && !window.confirm("重新开始会清除上次进度，确定吗？")) return;
+      clearSaved();
+      begin(null);
+    });
+    $("btnResume").addEventListener("click", function () {
+      var s = loadSaved();
+      if (s) begin(s);
+    });
+    $("btnPrev").addEventListener("click", prevQ);
+    $("btnConfirm").addEventListener("click", confirmAnswer);
+    $("btnNext").addEventListener("click", nextQ);
+    $("btnSubmit").addEventListener("click", requestResult);
+    $("btnSheet").addEventListener("click", function () { toggleSheet(true); });
+    $("btnSheetClose").addEventListener("click", function () { toggleSheet(false); });
+    $("sheet").addEventListener("click", function (e) {
+      if (e.target === $("sheet")) toggleSheet(false);
+    });
+    $("btnRestart").addEventListener("click", function () {
+      clearSaved();
+      begin(null);
+    });
+    $("btnBackHome").addEventListener("click", function () {
+      refreshStart();
+      showScreen("start");
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if ($("screen-quiz").classList.contains("hidden")) return;
+      var sheetOpen = !$("sheet").classList.contains("hidden");
+      if (e.key === "Escape") {
+        if (sheetOpen) toggleSheet(false);
+        return;
+      }
+      if (sheetOpen) return;
+      var q = QUESTIONS[state.cur];
+      var key = e.key.toUpperCase();
+      if (/^[A-E]$/.test(key)) {
+        var exists = q.options.some(function (pair) { return pair[0] === key; });
+        if (exists) {
+          e.preventDefault();
+          toggleOption(state.cur, key);
+        }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (state.confirmed[state.cur]) nextQ();
+        else if ((state.answers[state.cur] || []).length) confirmAnswer();
+        else flash("请先选择一个答案");
+      } else if (e.key === "ArrowLeft") {
+        prevQ();
+      } else if (e.key === "ArrowRight") {
+        nextQ();
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
